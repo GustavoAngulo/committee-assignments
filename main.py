@@ -14,51 +14,38 @@ import numpy as np
 class Person():
 
     def __init__(self, csv_row):
+        self.name = csv_row[2]
+        self.assignment = None
         self.timestamp = csv_row[0]
         self.email = csv_row[1]
-        self.name = csv_row[2]
         self.andrewID = csv_row[3]
         self.year = csv_row[4]
         self.choices = [csv_row[i] for i in range(5,11)]
-        self.assignment = None
+        if len(self.choices[0]) == 0:
+            self.choices = []
 
 
 class CommitteeAssignment():
 
     def __init__(self, path):
-        # self.comm_sizes = {
-        #     "Social": 9,
-        #     "Brotherhood": 8,
-        #     "Philanthropy": 7,
-        #     "Community Service": 3,
-        #     "Outreach": 3,
-        #     "Recruitment": 12,
-        #     "Phi Ed": 7,
-        #     "Greek Sing": 6,
-        #     "Housing": 6,
-        #     "Scholarship": 6,
-        #     "Risk": 5,
-        #     "Buggy": 5,
-        #     "Bylaws": 3
-        # }
+        self.comm_sizes = {
+            "Social": 12,
+            "Brotherhood": 11,
+            "Philanthropy": 7,
+            "Community Service": 3,
+            "Outreach": 3,
+            "Recruitment": 12,
+            "Phi Ed": 7,
+            "Greek Sing": 6,
+            "Housing": 4,
+            "Scholarship": 3,
+            "Risk": 3,
+            "Buggy": 4,
+            "Bylaws": 2
+        }
+        print(sum(self.comm_sizes.values()))
         self.num_choices = 6
         self.path = path
-
-        self.comm_sizes = {
-            "Social": 2,
-            "Brotherhood": 2,
-            "Philanthropy": 2,
-            "Community Service": 2,
-            "Outreach": 2,
-            "Recruitment": 2,
-            "Phi Ed": 2,
-            "Greek Sing": 2,
-            "Housing": 2,
-            "Scholarship": 2,
-            "Risk": 1,
-            "Buggy": 1,
-            "Bylaws": 1
-        }
 
         self.comm_indexes = self.makeCommitteeIndexes() # used for cost matrix
 
@@ -112,10 +99,16 @@ class CommitteeAssignment():
         for i in range(self.num_choices + 1):
             num_people = 0
             for person in self.people:
-                if i < self.num_choices and person.assignment == person.choices[i]:
+                if len(person.choices) > 0 and i < self.num_choices and person.assignment == person.choices[i]:
                     num_people += 1
             print(str(num_people) + switcher[i])
 
+        for committee in self.comm_sizes:
+            people_in_committee = list(map(lambda p: p.name, filter((lambda p: p.assignment == committee), self.people)))
+            print("######################################################")
+            if (len(people_in_committee) < self.comm_sizes[committee]):
+                print("{} NEEDS {} MORE PEOPLE".format(committee.upper(), self.comm_sizes[committee] - len(people_in_committee)))
+            print("{}: {}".format(committee,str(people_in_committee)))
 
     def run(self):
 
@@ -123,7 +116,6 @@ class CommitteeAssignment():
             self.csv_file = list(csv.reader(file))
 
         self.people = [Person(row) for row in self.csv_file[1:]]
-
         self.costs = self.makeCostMatrix()
 
         self.makeAssignments()

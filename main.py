@@ -14,17 +14,16 @@ import numpy as np
 class Person():
 
     def __init__(self, csv_row):
-        self.name = csv_row[2]
-        self.assignment = None
         self.timestamp = csv_row[0]
         self.email = csv_row[1]
+        self.name = csv_row[2]
         self.andrewID = csv_row[3]
         self.year = csv_row[4]
         self.choices = [csv_row[i] for i in range(5,11)]
         if len(self.choices[0]) == 0:
             self.choices = []
-
-
+        self.assignment = None
+        
 class CommitteeAssignment():
 
     def __init__(self, path):
